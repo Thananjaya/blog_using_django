@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.views.generic import ListView
 from .models import Post
 
 def post_index(request):
@@ -34,3 +35,9 @@ def post_show(request, year, month, day, post):
 	"""
 	post = get_object_or_404(Post, slug = post, status='published', publish__year = year, publish__month = month, publish__day = day)
 	return render(request, 'blog/post/detail.html', {'post': post })
+
+class PostIndexView(ListView):
+	queryset = Post.objects.filter(status="published")
+	context_object_name = 'posts'
+	paginate_by  = 2
+	template_name = 'blog/post/index.html'
