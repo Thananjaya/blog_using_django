@@ -9,7 +9,7 @@ from . import views
 
 app_name = 'blog'
 
-url_paterns = [
+urlpatterns = [
 	path('', views.post_index, name='post_index'),
 	path('<int:year>/<int:month>/<int:day>/<slug:post>/', views.post_show, name="post_show")
 ]

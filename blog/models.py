@@ -5,7 +5,7 @@ from django.urls import reverse
 
 class PublishedManager(models.Manager):
 	def get_query(self):
-		return super(PublishedManager, self).get_queryset().filter(status='published')
+		return super(PublishedManager, self).get_queryset().filter(status='draft')
 
 
 class Post(models.Model):

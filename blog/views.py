@@ -9,7 +9,7 @@ def post_index(request):
 			request: http request
 	"""
 	posts = Post.published.all()
-	return render(request, 'blog/post/index.html', { 'posts': posts})
+	return render(request, 'blog/post/index.html', { 'posts': posts })
 
 
 def post_show(request, year, month, day, post):
@@ -24,4 +24,4 @@ def post_show(request, year, month, day, post):
 			post: slug for filtering over the list of posts
 	"""
 	post = get_object_or_404(Post, slug = post, status='published', publish__year = year, publish__month = month, publish__day = day)
-	return render(request, 'blog/post/detail.html', {'post': post})
+	return render(request, 'blog/post/detail.html', {'post': post })
