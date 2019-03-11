@@ -9,7 +9,7 @@ def post_index(request):
 		arguement:
 			request: http request
 	"""
-	post_lists = Post.published.all()
+	post_lists = Post.objects.filter(status="published")
 	paginator = Paginator(post_lists, 5)
 	page_number = request.GET.get('page')
 	try:
@@ -18,7 +18,7 @@ def post_index(request):
 		posts = paginator.page(1)
 	except PageNotAnInteger:
 		posts = paginator.page(paginator.num_pages)
-	return render(request, 'blog/post/index.html', { 'posts': posts, 'page': page_number })
+	return render(request, 'blog/post/index.html', { 'posts': posts })
 
 
 def post_show(request, year, month, day, post):
