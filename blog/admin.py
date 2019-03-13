@@ -17,3 +17,4 @@ class CommentAdmin(admin.ModelAdmin):
 	list_filter = ('active', 'updated', 'created')
 	search_fields = ('author', 'email', 'message')
 	raw_id_fields = ('post',)
+	

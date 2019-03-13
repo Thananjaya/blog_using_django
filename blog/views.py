@@ -4,8 +4,9 @@ from django.views.generic import ListView
 from django.core.mail import send_mail
 from .models import Post
 from .forms import SharePostForm, CommentForm
+from taggit.models import Tag
 
-def post_index(request):
+def post_index(request, tag_slug=None):
 	"""
 		returns list of published posts
 
@@ -13,6 +14,10 @@ def post_index(request):
 			request: http request
 	"""
 	post_lists = Post.objects.filter(status="published")
+	tag = None
+	if tag_slug:
+		tag = get_object_or_404(Tag, slug = tag_slug)
+		post_lists = Post.objects.filter(tags__in = [tag])
 	paginator = Paginator(post_lists, 5)
 	page_number = request.GET.get('page')
 	try:
@@ -21,7 +26,7 @@ def post_index(request):
 		posts = paginator.page(1)
 	except PageNotAnInteger:
 		posts = paginator.page(paginator.num_pages)
-	return render(request, 'blog/post/index.html', { 'posts': posts })
+	return render(request, 'blog/post/index.html', { 'posts': posts, 'tag': tag })
 
 
 def post_show(request, year, month, day, post):
@@ -40,7 +45,7 @@ def post_show(request, year, month, day, post):
 	new_comment = None
 
 	if request.method == 'POST':
-		comment_form = CommentForm(data = request.POST)
+		comment_form = CommentForm(request.POST)
 		if comment_form.is_valid():
 			new_comment = comment_form.save(commit = False)
 			new_comment.post = post
