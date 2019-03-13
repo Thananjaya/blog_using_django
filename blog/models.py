@@ -1,3 +1,9 @@
+"""
+	Models for Blog applications
+
+		Post model, where user can add an post which consists of title and body
+"""
+
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
