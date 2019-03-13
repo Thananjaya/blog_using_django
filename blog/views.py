@@ -3,7 +3,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.views.generic import ListView
 from django.core.mail import send_mail
 from .models import Post
-from .forms import SharePostForm
+from .forms import SharePostForm, CommentForm
 
 def post_index(request):
 	"""
@@ -36,12 +36,24 @@ def post_show(request, year, month, day, post):
 			post: slug for filtering over the list of posts
 	"""
 	post = get_object_or_404(Post, slug = post, status='published', publish__year = year, publish__month = month, publish__day = day)
-	return render(request, 'blog/post/detail.html', {'post': post })
+	comments = post.comments.filter(active = True)
+	new_comment = None
+
+	if request.method == 'POST':
+		comment_form = CommentForm(data = request.POST)
+		if comment_form.is_valid():
+			new_comment = comment_form.save(commit = False)
+			new_comment.post = post
+			new_comment.save()
+	else:
+		comment_form = CommentForm()
+
+	return render(request, 'blog/post/detail.html', {'post': post, 'comments': comments, 'comment_form': comment_form, 'new_comment': new_comment })
 
 
 def share_post(request, post_id):
 	"""
-		Sahring a post via email,
+		Sharing a post via email,
 
 		Arguements:
 			request: HTTP request

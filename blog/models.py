@@ -29,9 +29,24 @@ class Post(models.Model):
 		return reverse('blog:post_show', args=[self.publish.year, self.publish.month, self.publish.day, self.slug])
 
 
-class Meta:
-	ordering = ('-publish',)
+	class Meta:
+		ordering = ('-publish',)
 
 
-def __str__(self):
-	return self.title
+	def __str__(self):
+		return self.title
+
+class Comment(models.Model):
+	post = models.ForeignKey(Post, on_delete = models.CASCADE, related_name="comments")
+	author = models.CharField(max_length = 25)
+	email = models.EmailField()
+	message = models.TextField()
+	created = models.DateTimeField(auto_now_add = True)
+	updated = models.DateTimeField(auto_now = True)
+	active = models.BooleanField(default = True)
+
+	class meta:
+		ordering = ('created',)
+
+	def __str__(self):
+		return 'Comment by {} on {}'.format(self.author, self.post)
