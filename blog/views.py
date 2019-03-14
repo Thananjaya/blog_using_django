@@ -56,7 +56,6 @@ def post_show(request, year, month, day, post):
 
 	post_tags_id = post.tags.values_list('id', flat = True)
 	similar_posts = Post.objects.filter(status = 'published', tags__in = post_tags_id).exclude(id = post.id)
-	similar_posts = similar_posts.annotate(same_tags = Count('tags')).order_by('-same_tags', "-publish")
 	return render(request, 'blog/post/detail.html', {'post': post, 'comments': comments, 'comment_form': comment_form, 'new_comment': new_comment, 'similar_posts':similar_posts })
 
 
