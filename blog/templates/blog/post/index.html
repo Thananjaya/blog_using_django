@@ -22,7 +22,7 @@
 		<p class="date">
 			Written by {{ post.author }} on {{ post.publish }}
 		</p>
-		{{ post.body|markdown|truncatewords_limit:30 }}
+		{{ post.body|markdown|truncatewords_html:30 }}
 	{% endfor %}
   {% include "pagination.html" with page=posts %}
 {% endblock %}
