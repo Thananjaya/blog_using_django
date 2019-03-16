@@ -3,8 +3,9 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.views.generic import ListView
 from django.core.mail import send_mail
 from django.db.models import Count
+from django.contrib.postgres.search import SearchVector
 from .models import Post
-from .forms import SharePostForm, CommentForm
+from .forms import SharePostForm, CommentForm, SearchForm
 from taggit.models import Tag
 
 def post_index(request, tag_slug=None):
@@ -47,9 +48,9 @@ def post_show(request, year, month, day, post):
 	new_comment = None
 
 	if request.method == 'POST':
-		comment_form = CommentForm(request.POST)
-		if comment_form.is_valid():
-			new_comment = comment_form.save(commit = False)
+		comment_form_data = CommentForm(request.POST)
+		if comment_form_data.is_valid():
+			new_comment = comment_form_data.save(commit = False)
 			new_comment.post = post
 			new_comment.save()
 	else:
@@ -73,7 +74,7 @@ def share_post(request, post_id):
 	if request.method == 'POST':
 		form =  SharePostForm(request.POST)
 		if form.is_valid():
-			# cleaned data will be having the form data that is valid
+			# cleaned data will be having the valid data that is been entered in the form
 			valid_data = form.cleaned_data
 			# used to difne the url for the user to click, since post detail page is defined by slug rule
 			post_url = request.build_absolute_uri(post.get_absolute_url())
@@ -85,6 +86,17 @@ def share_post(request, post_id):
 		form = SharePostForm()
 	return render(request, 'blog/post/share_post_form.html', { 'post': post, 'form': form, 'sent': sent })
 
+
+def search_post(request):
+	form = SearchForm()
+	query = None
+	results = []
+	if 'search_query' in request.GET:
+		form = SearchForm(request.GET)
+		if form.is_valid():
+			query = form.cleaned_data['search_query']
+			results = Post.objects.annotate(search = SearchVector('title', 'body')).filter(search = query)
+	return render(request, 'blog/post/search_post.html', {'form': form, 'results': results, 'query': query})
 
 #  class based view
 class PostIndexView(ListView):
