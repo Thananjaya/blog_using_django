@@ -13,6 +13,7 @@ def post_index(request, tag_slug=None):
 
 		arguement:
 			request: http request
+			tag_slug: required by the taggit model
 	"""
 	post_lists = Post.objects.filter(status = "published")
 	tag = None
