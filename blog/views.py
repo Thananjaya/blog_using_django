@@ -3,7 +3,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.views.generic import ListView
 from django.core.mail import send_mail
 from django.db.models import Count
-from django.contrib.postgres.search import SearchVector
+from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
 from .models import Post
 from .forms import SharePostForm, CommentForm, SearchForm
 from taggit.models import Tag
@@ -88,6 +88,17 @@ def share_post(request, post_id):
 
 
 def search_post(request):
+	"""
+		Returns search results of blog objects
+
+		arguements:
+			request: http requeest
+
+		objects:
+			SearchVector: performs search for each object's title and body
+			SearchQuery: it is used to obtain better matches
+			SearchRank: returns results based on how often the query terms appear
+	"""
 	form = SearchForm()
 	query = None
 	results = []
@@ -95,7 +106,9 @@ def search_post(request):
 		form = SearchForm(request.GET)
 		if form.is_valid():
 			query = form.cleaned_data['search_query']
-			results = Post.objects.annotate(search = SearchVector('title', 'body')).filter(search = query)
+			search_vector = SearchVector('title', 'body')
+			searc_query = SearchQuery(query)
+			results = Post.objects.annotate(search = search_vector, rank= SearchRank(search_vector, searc_query)).filter(search = search_query).order_by('-rank')
 	return render(request, 'blog/post/search_post.html', {'form': form, 'results': results, 'query': query})
 
 #  class based view

@@ -11,7 +11,7 @@
 			{% endif %}	
 		{% endwith %}	
 		{% for post in results %}
-			<h3><a href="{{ post.absolute_url }}">{{ post.title }}</a></h3>
+			<h3><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></h3>
 			<p>{{ post.body|truncatewords:10 }}</p>
 			<hr/>
 			<div style="margin: 20px;">
